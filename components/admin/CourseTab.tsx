@@ -2,20 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Trash2, Edit, Save, X, Plus, Loader2, Layers } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, X, Loader2, UploadCloud } from 'lucide-react';
 
 export default function CourseTab() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Single Add state
   const [newCourse, setNewCourse] = useState('');
-  
-  // Bulk Add state
   const [bulkCourses, setBulkCourses] = useState('');
-  const [showBulk, setShowBulk] = useState(false);
-
-  // Edit state
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
 
@@ -25,41 +18,38 @@ export default function CourseTab() {
 
   const fetchCourses = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('courses').select('*').order('id', { ascending: true });
+    const { data, error } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
     if (error) console.error('Error fetching courses:', error);
     else setCourses(data || []);
     setLoading(false);
   };
 
-  const handleAddCourse = async (e: React.FormEvent) => {
+  const handleAddSingle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCourse.trim()) return;
-    
     const { error } = await supabase.from('courses').insert([{ course_name: newCourse.trim() }]);
-    if (error) alert('Error adding course: ' + error.message);
+    if (error) alert('Error: ' + error.message);
     else {
       setNewCourse('');
       fetchCourses();
     }
   };
 
-  const handleBulkAdd = async () => {
-    const coursesArray = bulkCourses.split('\n').map(c => c.trim()).filter(c => c.length > 0);
-    if (coursesArray.length === 0) return;
-
-    const insertData = coursesArray.map(c => ({ course_name: c }));
-    
-    const { error } = await supabase.from('courses').insert(insertData);
-    if (error) alert('Error bulk adding courses: ' + error.message);
+  const handleBulkAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bulkCourses.trim()) return;
+    const courseNames = bulkCourses.split('\n').map(c => c.trim()).filter(c => c);
+    const inserts = courseNames.map(name => ({ course_name: name }));
+    const { error } = await supabase.from('courses').insert(inserts);
+    if (error) alert('Error bulk adding: ' + error.message);
     else {
       setBulkCourses('');
-      setShowBulk(false);
       fetchCourses();
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Delete this course? It might be linked to existing students.')) return;
+    if (!confirm('Are you sure you want to delete this course?')) return;
     const { error } = await supabase.from('courses').delete().eq('id', id);
     if (error) alert('Error deleting: ' + error.message);
     else fetchCourses();
@@ -71,6 +61,7 @@ export default function CourseTab() {
   };
 
   const handleSave = async (id: number) => {
+    if (!editName.trim()) return;
     const { error } = await supabase.from('courses').update({ course_name: editName }).eq('id', id);
     if (error) alert('Error updating: ' + error.message);
     else {
@@ -79,97 +70,99 @@ export default function CourseTab() {
     }
   };
 
-  if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-indigo-500 w-8 h-8" /></div>;
-
   return (
-    <div className="space-y-6">
-      {/* Action Bar */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <form onSubmit={handleAddCourse} className="flex-1 flex gap-2 w-full">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Left Column: Add Forms */}
+      <div className="lg:col-span-1 space-y-8">
+        {/* Single Add */}
+        <div className="glass-card p-6 md:p-8 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-[var(--color-brand-orange)]"></div>
+          <h3 className="text-lg font-black text-[var(--color-brand-blue)] mb-6 flex items-center gap-2 uppercase tracking-wide">
+            <Plus className="w-5 h-5 text-[var(--color-brand-orange)]" />
+            Add Course
+          </h3>
+          <form onSubmit={handleAddSingle} className="space-y-4">
             <input 
               type="text" 
               value={newCourse} 
-              onChange={e => setNewCourse(e.target.value)}
-              placeholder="Enter new course name"
-              className="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              onChange={e => setNewCourse(e.target.value)} 
+              placeholder="e.g. Graphic Design"
+              className="w-full md-input py-3 px-4"
             />
-            <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center font-medium transition-colors">
-              <Plus className="w-4 h-4 mr-2" /> Add Course
+            <button type="submit" className="md-btn-primary w-full py-3 text-sm">
+              ADD COURSE
             </button>
           </form>
-          <button 
-            onClick={() => setShowBulk(!showBulk)}
-            className="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg flex items-center font-medium transition-colors border border-indigo-100"
-          >
-            <Layers className="w-4 h-4 mr-2" /> {showBulk ? 'Cancel Bulk Add' : 'Bulk Add'}
-          </button>
         </div>
 
-        {showBulk && (
-          <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-4 duration-300">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Paste multiple courses (one per line):</label>
+        {/* Bulk Add */}
+        <div className="glass-card p-6 md:p-8 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-[var(--color-brand-orange)]"></div>
+          <h3 className="text-lg font-black text-[var(--color-brand-blue)] mb-2 flex items-center gap-2 uppercase tracking-wide">
+            <UploadCloud className="w-5 h-5 text-[var(--color-brand-orange)]" />
+            Bulk Add
+          </h3>
+          <p className="text-xs font-bold text-slate-500 mb-6 uppercase tracking-wider">Enter one course name per line</p>
+          <form onSubmit={handleBulkAdd} className="space-y-4">
             <textarea 
-              value={bulkCourses}
-              onChange={e => setBulkCourses(e.target.value)}
+              value={bulkCourses} 
+              onChange={e => setBulkCourses(e.target.value)} 
               rows={5}
-              className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-3 resize-none"
-              placeholder="Mathematics 101&#10;Physics 202&#10;Computer Science 303"
+              placeholder="Course 1&#10;Course 2&#10;Course 3"
+              className="w-full md-input py-3 px-4 resize-none"
             />
-            <div className="flex justify-end">
-              <button onClick={handleBulkAdd} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                Save All Courses
-              </button>
-            </div>
-          </div>
-        )}
+            <button type="submit" className="md-btn-secondary w-full py-3 text-sm">
+              BULK IMPORT
+            </button>
+          </form>
+        </div>
       </div>
 
-      {/* Courses List */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-sm">
-              <th className="p-4 font-semibold w-16 text-center">ID</th>
-              <th className="p-4 font-semibold">Course Name</th>
-              <th className="p-4 font-semibold text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200">
-            {courses.length === 0 ? (
-              <tr><td colSpan={3} className="p-8 text-center text-slate-500">No courses available.</td></tr>
-            ) : courses.map((course) => (
-              <tr key={course.id} className="hover:bg-slate-50 transition-colors">
-                <td className="p-4 text-center text-slate-400 text-sm">{course.id}</td>
-                {editingId === course.id ? (
-                  <>
-                    <td className="p-4">
+      {/* Right Column: Course List */}
+      <div className="lg:col-span-2">
+        <div className="glass-card overflow-hidden p-6 md:p-8 h-full">
+          <h3 className="text-xl font-black text-[var(--color-brand-blue)] mb-6 uppercase tracking-wide border-b border-slate-200 pb-3">Course Catalog</h3>
+          {loading ? (
+            <div className="flex justify-center p-12">
+              <Loader2 className="animate-spin text-[var(--color-brand-orange)] w-10 h-10" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {courses.length === 0 ? (
+                <div className="text-center p-10 bg-white/40 rounded-xl border-2 border-dashed border-slate-300">
+                  <p className="text-slate-600 font-bold uppercase tracking-wider">No courses available</p>
+                </div>
+              ) : courses.map(course => (
+                <div key={course.id} className="flex items-center justify-between p-4 bg-white/60 hover:bg-white transition-all rounded-lg shadow-sm border-2 border-[#cbd5e1] hover:border-[var(--color-brand-orange)]">
+                  {editingId === course.id ? (
+                    <div className="flex items-center gap-3 w-full">
                       <input 
                         type="text" 
                         value={editName} 
                         onChange={e => setEditName(e.target.value)} 
-                        className="border border-slate-300 px-3 py-1.5 w-full max-w-md rounded focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                        className="flex-1 md-input px-3 py-1.5"
                         autoFocus
                       />
-                    </td>
-                    <td className="p-4 text-right space-x-2">
-                      <button onClick={() => handleSave(course.id)} className="text-emerald-600 hover:bg-emerald-50 p-2 rounded-full"><Save className="w-5 h-5" /></button>
-                      <button onClick={() => setEditingId(null)} className="text-slate-500 hover:bg-slate-100 p-2 rounded-full"><X className="w-5 h-5" /></button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="p-4 font-medium text-slate-800">{course.course_name}</td>
-                    <td className="p-4 text-right space-x-1">
-                      <button onClick={() => handleEditClick(course)} className="text-blue-600 hover:bg-blue-50 p-2 rounded-full transition-colors"><Edit className="w-4 h-4" /></button>
-                      <button onClick={() => handleDelete(course.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
-                    </td>
-                  </>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                      <button onClick={() => handleSave(course.id)} className="p-2 bg-emerald-100 text-emerald-700 rounded shadow-sm hover:bg-emerald-200"><Save className="w-5 h-5" /></button>
+                      <button onClick={() => setEditingId(null)} className="p-2 bg-slate-200 text-slate-700 rounded shadow-sm hover:bg-slate-300"><X className="w-5 h-5" /></button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-4">
+                        <div className="w-2 h-2 rounded-full bg-[var(--color-brand-orange)] shadow-[0_0_8px_rgba(230,126,34,0.8)]"></div>
+                        <span className="font-bold text-[var(--color-brand-blue)] text-lg">{course.course_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => handleEditClick(course)} className="p-2 bg-slate-100 text-[var(--color-brand-blue)] rounded shadow-sm hover:bg-slate-200 transition-colors"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete(course.id)} className="p-2 bg-red-50 text-red-600 rounded shadow-sm hover:bg-red-100 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -27,7 +27,6 @@ export default function SecurityTab() {
 
     setLoading(true);
     try {
-      // First verify the current password using our secure RPC
       const { data: isValid, error: verifyError } = await supabase.rpc('verify_admin', {
         p_username: 'admin',
         p_password: currentPassword
@@ -39,9 +38,6 @@ export default function SecurityTab() {
         return;
       }
 
-      // If valid, update the password using another RPC function (we would need to create this in SQL)
-      // Since we don't have an update RPC yet, we will just simulate it for now or rely on SQL.
-      // Wait, we need an RPC to change the password securely since RLS blocks writing.
       const { error: updateError } = await supabase.rpc('change_admin_password', {
         p_username: 'admin',
         p_new_password: newPassword
@@ -64,64 +60,66 @@ export default function SecurityTab() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="p-6 md:p-8">
-        <div className="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
-            <Shield className="w-6 h-6" />
+    <div className="glass-card overflow-hidden relative">
+      <div className="absolute top-0 left-0 w-full h-1 bg-[var(--color-brand-orange)]"></div>
+      
+      <div className="p-8 md:p-12">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-4 bg-white/60 backdrop-blur-md rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.05)] border border-white">
+            <Shield className="w-8 h-8 text-[var(--color-brand-orange)]" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-800">Security Settings</h2>
-            <p className="text-sm text-slate-500">Manage your admin credentials securely.</p>
+            <h2 className="text-2xl font-black text-[var(--color-brand-blue)] uppercase tracking-wider">Security Settings</h2>
+            <p className="text-slate-600 font-bold mt-1 text-sm uppercase tracking-wide">Manage your admin credentials securely</p>
           </div>
         </div>
 
         <div className="max-w-md">
           {message.text && (
-            <div className={`p-4 mb-6 rounded-lg flex items-center gap-2 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+            <div className={`p-4 mb-8 rounded-lg font-bold flex items-center gap-3 shadow-sm ${message.type === 'success' ? 'bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700' : 'bg-red-50 border-l-4 border-red-500 text-red-700'}`}>
               {message.type === 'success' && <CheckCircle2 className="w-5 h-5" />}
               <span>{message.text}</span>
             </div>
           )}
 
-          <form onSubmit={handleChangePassword} className="space-y-4">
+          <form onSubmit={handleChangePassword} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Current Password</label>
+              <label className="block text-xs font-bold text-[var(--color-brand-blue)] mb-1 uppercase tracking-wider">Current Password</label>
               <div className="relative">
-                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input 
                   type="password" 
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg py-2 pl-10 pr-4 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full md-input py-3 pl-12 pr-4"
                   required
                 />
               </div>
             </div>
             
-            <div className="pt-4 border-t border-slate-100">
-              <label className="block text-sm font-medium text-slate-700 mb-1">New Password</label>
+            <div className="pt-6 border-t border-slate-200/50">
+              <label className="block text-xs font-bold text-[var(--color-brand-blue)] mb-1 uppercase tracking-wider">New Password</label>
               <div className="relative">
-                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input 
                   type="password" 
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg py-2 pl-10 pr-4 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full md-input py-3 pl-12 pr-4"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Confirm New Password</label>
+              <label className="block text-xs font-bold text-[var(--color-brand-blue)] mb-1 uppercase tracking-wider">Confirm New Password</label>
               <div className="relative">
-                <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input 
                   type="password" 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg py-2 pl-10 pr-4 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="w-full md-input py-3 pl-12 pr-4"
                   required
                 />
               </div>
@@ -130,10 +128,10 @@ export default function SecurityTab() {
             <button 
               type="submit" 
               disabled={loading}
-              className="mt-6 w-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-lg transition-colors disabled:opacity-70"
+              className="md-btn-primary w-full flex items-center justify-center py-4 mt-8 text-sm"
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-              {loading ? 'Updating...' : 'Update Password'}
+              {loading ? 'UPDATING...' : 'UPDATE PASSWORD'}
             </button>
           </form>
         </div>

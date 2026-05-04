@@ -1,26 +1,139 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-brand-blue: #2C3E50;
+  --color-brand-orange: #E67E22;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-blue: var(--color-brand-blue);
+  --color-brand-orange: var(--color-brand-orange);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  /* Glassmorphism Classes */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border-radius: 24px;
+  }
+  
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+  }
+
+  /* Material Design Buttons */
+  .md-btn-primary {
+    background-color: var(--color-brand-orange);
+    color: white;
+    border: 2px solid black;
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px -1px rgba(230, 126, 34, 0.4), 0 2px 4px -1px rgba(230, 126, 34, 0.2);
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .md-btn-primary:hover {
+    box-shadow: 0 10px 15px -3px rgba(230, 126, 34, 0.5), 0 4px 6px -2px rgba(230, 126, 34, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .md-btn-primary:active {
+    box-shadow: 0 2px 4px -1px rgba(230, 126, 34, 0.4);
+    transform: translateY(1px);
+  }
+
+  .md-btn-secondary {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: var(--color-brand-blue);
+    border: 2px solid black;
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .md-btn-secondary:hover {
+    background-color: rgba(44, 62, 80, 0.05);
+  }
+
+  /* Material Inputs */
+  .md-input {
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    color: var(--color-brand-blue);
+  }
+  
+  .md-input:focus {
+    outline: none;
+    border-color: var(--color-brand-orange);
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  .md-input::placeholder {
+    color: #94a3b8;
   }
 }
 
+button {
+  border: 2px solid black !important;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Dynamic Background for Glassmorphism */
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  position: relative;
+  min-height: 100vh;
+  color: var(--color-brand-blue);
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+/* Beautiful Animated Background Shapes */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.5;
+  animation: float 20s infinite ease-in-out alternate;
+}
+
+body::before {
+  width: 600px;
+  height: 600px;
+  background: rgba(44, 62, 80, 0.15); /* Brand Blue faint */
+  top: -100px;
+  left: -100px;
+}
+
+body::after {
+  width: 500px;
+  height: 500px;
+  background: rgba(230, 126, 34, 0.15); /* Brand Orange faint */
+  bottom: -100px;
+  right: -100px;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
 }

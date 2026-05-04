@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle2, User, Mail, Phone, MapPin, Building, GraduationCap, Loader2 } from 'lucide-react';
+import { CheckCircle2, User, Mail, Phone, MapPin, Building, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 type Course = {
   id: number;
@@ -105,14 +106,14 @@ export default function Home() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center p-6">
-        <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center">
-          <CheckCircle2 className="w-20 h-20 text-emerald-500 mx-auto mb-5" />
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">Registration Successful!</h2>
-          <p className="text-gray-500 mb-8">We received your details and will be in touch shortly.</p>
+      <div className="min-h-screen flex items-center justify-center p-6 relative z-10">
+        <div className="glass-card p-10 max-w-md w-full text-center animate-in zoom-in duration-500">
+          <CheckCircle2 className="w-24 h-24 text-[var(--color-brand-orange)] mx-auto mb-6" />
+          <h2 className="text-3xl font-bold text-[var(--color-brand-blue)] mb-3">Registration Successful!</h2>
+          <p className="text-slate-600 mb-8 font-medium">We received your details and will be in touch shortly.</p>
           <button
             onClick={() => setSuccess(false)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-full transition-all shadow-md hover:shadow-lg"
+            className="md-btn-primary w-full py-4 text-lg"
           >
             Register Another Student
           </button>
@@ -122,169 +123,195 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 py-14 px-4">
-      {/* Header */}
-      <div className="text-center mb-10">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-500/20 ring-1 ring-indigo-400/40 mb-4">
-          <GraduationCap className="w-7 h-7 text-indigo-300" />
+    <div className="min-h-screen py-14 px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      {/* Header with Logo */}
+      <div className="text-center mb-12 flex flex-col items-center">
+        <div className="mb-6 bg-white p-2 rounded-2xl shadow-lg border border-slate-100 inline-block overflow-hidden">
+          <Image 
+            src="/logo.jpg" 
+            alt="DreamMore Logo" 
+            width={160} 
+            height={160} 
+            className="object-contain"
+            priority
+          />
         </div>
-        <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-200 mb-3">
-          Academy Portal
+        <h1 className="text-4xl md:text-5xl font-black text-[var(--color-brand-blue)] tracking-tight mb-3">
+          Student Registration
         </h1>
-        <p className="text-indigo-200/70 text-lg">Join our world-class learning platform today.</p>
+        <p className="text-[var(--color-brand-orange)] font-bold text-xl tracking-wide uppercase">
+          Right work at right time
+        </p>
       </div>
 
-      {/* Card */}
-      <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
-        {/* Top color bar */}
-        <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+      {/* Main Glass Card Form */}
+      <div className="max-w-4xl mx-auto glass-card p-8 sm:p-12 mb-20 relative overflow-hidden">
+        {/* Subtle decorative accent */}
+        <div className="absolute top-0 left-0 w-full h-2 bg-[var(--color-brand-orange)]"></div>
 
-        <form onSubmit={handleSubmit} className="p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-10">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-2">
 
           {/* ─── Left column: Personal Info ─── */}
-          <div className="space-y-5">
-            <h3 className="text-white font-bold text-lg flex items-center gap-2 border-b border-white/10 pb-2">
-              <User className="w-5 h-5 text-indigo-400" /> Personal Details
+          <div className="space-y-6">
+            <h3 className="text-[var(--color-brand-blue)] font-bold text-xl flex items-center gap-2 mb-6 uppercase tracking-wider border-b border-slate-200 pb-3">
+              <User className="w-6 h-6 text-[var(--color-brand-orange)]" /> 
+              Personal Details
             </h3>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="text-indigo-200 text-sm font-medium block mb-1">First Name</label>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">First Name</label>
                 <input required name="firstName" value={formData.firstName} onChange={handleChange}
                   placeholder="John"
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+                  className="w-full md-input px-4 py-3" />
               </div>
               <div>
-                <label className="text-indigo-200 text-sm font-medium block mb-1">Last Name</label>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Last Name</label>
                 <input required name="lastName" value={formData.lastName} onChange={handleChange}
                   placeholder="Doe"
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+                  className="w-full md-input px-4 py-3" />
               </div>
             </div>
 
             <div>
-              <label className="text-indigo-200 text-sm font-medium block mb-1">Email Address</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input required type="email" name="email" value={formData.email} onChange={handleChange}
                   placeholder="john@example.com"
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+                  className="w-full md-input pl-12 pr-4 py-3" />
               </div>
             </div>
 
             <div>
-              <label className="text-indigo-200 text-sm font-medium block mb-1">Phone Number</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Phone Number</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input required type="tel" name="phone" value={formData.phone} onChange={handleChange}
                   placeholder="+1 555 000-0000"
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+                  className="w-full md-input pl-12 pr-4 py-3" />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="text-indigo-200 text-sm font-medium block mb-1">Date of Birth</label>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Date of Birth</label>
                 <input required type="date" name="dob" value={formData.dob} onChange={handleChange}
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition [color-scheme:dark]" />
+                  className="w-full md-input px-4 py-3" />
               </div>
               <div>
-                <label className="text-indigo-200 text-sm font-medium block mb-1">Gender</label>
-                <select required name="gender" value={formData.gender} onChange={handleChange}
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
-                  <option value="" disabled>Select</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                </select>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Gender</label>
+                <div className="relative">
+                  <select required name="gender" value={formData.gender} onChange={handleChange}
+                    className="w-full md-input px-4 py-3 appearance-none cursor-pointer">
+                    <option value="" disabled>Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* ─── Right column: Location & Courses ─── */}
-          <div className="space-y-5">
-            <h3 className="text-white font-bold text-lg flex items-center gap-2 border-b border-white/10 pb-2">
-              <MapPin className="w-5 h-5 text-indigo-400" /> Location & Courses
+          <div className="space-y-6">
+            <h3 className="text-[var(--color-brand-blue)] font-bold text-xl flex items-center gap-2 mb-6 uppercase tracking-wider border-b border-slate-200 pb-3">
+              <MapPin className="w-6 h-6 text-[var(--color-brand-orange)]" /> 
+              Location & Courses
             </h3>
 
             <div>
-              <label className="text-indigo-200 text-sm font-medium block mb-1">Address</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Address</label>
               <textarea required name="address" value={formData.address} onChange={handleChange}
                 rows={2} placeholder="123 Main Street, Apt 4B"
-                className="w-full bg-slate-900/60 border border-slate-700 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-none" />
+                className="w-full md-input px-4 py-3 resize-none" />
             </div>
 
             <div>
-              <label className="text-indigo-200 text-sm font-medium block mb-1">City</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">City</label>
               <div className="relative">
-                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400" />
+                <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input required name="city" value={formData.city} onChange={handleChange}
                   placeholder="New York"
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+                  className="w-full md-input pl-12 pr-4 py-3" />
               </div>
             </div>
 
             {/* ─── Courses ─── */}
             <div>
-              <label className="text-indigo-200 text-sm font-medium block mb-2">
-                Select Courses <span className="text-slate-400">(multiple allowed)</span>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-3">
+                Select Courses <span className="text-slate-500 font-normal ml-1">(multiple allowed)</span>
               </label>
 
-              <div className="bg-slate-900/40 border border-slate-700/60 rounded-xl p-3 max-h-52 overflow-y-auto space-y-1">
+              <div className="glass-panel p-2 max-h-[200px] overflow-y-auto">
                 {loading && (
-                  <div className="flex items-center gap-2 py-4 justify-center text-indigo-300">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span className="text-sm">Loading courses...</span>
+                  <div className="flex flex-col items-center gap-3 py-6 text-slate-600">
+                    <Loader2 className="w-8 h-8 animate-spin text-[var(--color-brand-orange)]" />
+                    <span className="font-bold">Loading courses...</span>
                   </div>
                 )}
 
                 {!loading && fetchError && (
-                  <p className="text-red-400 text-sm text-center py-4">{fetchError}</p>
+                  <div className="p-3 bg-red-50 text-red-700 rounded-lg text-center font-bold text-sm">
+                    {fetchError}
+                  </div>
                 )}
 
                 {!loading && !fetchError && courses.length === 0 && (
-                  <p className="text-slate-400 text-sm text-center py-4">
-                    No courses yet. Add them in the Admin panel.
-                  </p>
+                  <div className="text-slate-600 text-center py-6 font-bold">
+                    No courses available yet.
+                  </div>
                 )}
 
-                {!loading && !fetchError && courses.map(course => {
-                  const checked = formData.selectedCourses.includes(course.course_name);
-                  return (
-                    <label key={course.id}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
-                        checked ? 'bg-indigo-600/30 border border-indigo-500/40' : 'hover:bg-slate-800/50 border border-transparent'
-                      }`}>
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        checked ? 'bg-indigo-500 border-indigo-500' : 'border-slate-500'
-                      }`}>
-                        {checked && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
-                      </div>
-                      <input type="checkbox" className="sr-only"
-                        checked={checked}
-                        onChange={() => toggleCourse(course.course_name)} />
-                      <span className="text-sm text-slate-200 font-medium">{course.course_name}</span>
-                    </label>
-                  );
-                })}
+                {!loading && !fetchError && (
+                  <div className="grid grid-cols-1 gap-2">
+                    {courses.map(course => {
+                      const checked = formData.selectedCourses.includes(course.course_name);
+                      return (
+                        <label key={course.id}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 select-none ${
+                            checked ? 'bg-[var(--color-brand-orange)]/10 border border-[var(--color-brand-orange)]/50 shadow-sm' : 'bg-white/40 hover:bg-white/60 border border-transparent'
+                          }`}>
+                          
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${checked ? 'bg-[var(--color-brand-orange)] border-[var(--color-brand-orange)]' : 'bg-white border-slate-300'}`}>
+                            {checked && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                          </div>
+                          
+                          <span className={`text-sm font-bold ${checked ? 'text-[var(--color-brand-orange)]' : 'text-[var(--color-brand-blue)]'}`}>
+                            {course.course_name}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* ─── Submit ─── */}
-          <div className="md:col-span-2 pt-6 border-t border-white/10">
+          <div className="md:col-span-2 pt-6 mt-4">
             {submitError && (
-              <p className="text-red-300 text-sm text-center mb-4">{submitError}</p>
+              <div className="p-4 bg-red-50 text-red-700 rounded-lg border-l-4 border-red-500 mb-6 font-bold shadow-sm">
+                {submitError}
+              </div>
             )}
+            
             <button type="submit" disabled={submitting}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl shadow-lg transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed text-lg flex items-center justify-center gap-2">
-              {submitting
-                ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</>
-                : 'Complete Registration'}
+              className="md-btn-primary w-full py-4 text-lg flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed">
+              {submitting ? (
+                <><Loader2 className="w-6 h-6 animate-spin" /> PROCESSING...</>
+              ) : (
+                'SUBMIT REGISTRATION'
+              )}
             </button>
-            <p className="text-center text-xs text-slate-500 mt-3">
-              By registering, you agree to our Terms of Service and Privacy Policy.
+            <p className="text-center text-xs font-bold text-slate-500 mt-4 uppercase tracking-wider">
+              Powered by DreamMore
             </p>
           </div>
         </form>
