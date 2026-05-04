@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle2, User, Mail, Phone, MapPin, Building, Loader2 } from 'lucide-react';
+import { CheckCircle2, User, Mail, Phone, MapPin, Building, Loader2, Globe } from 'lucide-react';
 import Image from 'next/image';
 
 type Course = {
@@ -22,7 +22,77 @@ const INITIAL_FORM = {
   selectedCourses: [] as string[],
 };
 
+const TRANSLATIONS = {
+  en: {
+    title: "Student Registration",
+    subtitle: "Right work at right time",
+    personalDetails: "Personal Details",
+    firstName: "First Name",
+    lastName: "Last Name",
+    email: "Email Address",
+    phone: "Phone Number",
+    dob: "Date of Birth",
+    gender: "Gender",
+    select: "Select",
+    male: "Male",
+    female: "Female",
+    other: "Other",
+    locationCourses: "Location & Courses",
+    address: "Address",
+    city: "City",
+    selectCourses: "Select Courses",
+    multipleAllowed: "(multiple allowed)",
+    loading: "Loading courses...",
+    noCourses: "No courses available yet.",
+    submit: "SUBMIT REGISTRATION",
+    processing: "PROCESSING...",
+    poweredBy: "Powered by DreamMore",
+    successTitle: "Registration Successful!",
+    successMsg: "We received your details and will be in touch shortly.",
+    registerAnother: "Register Another Student",
+    placeholderFirst: "Abebe",
+    placeholderLast: "Kebede",
+    placeholderAddress: "Bole, Addis Ababa",
+    placeholderCity: "Addis Ababa"
+  },
+  am: {
+    title: "የተማሪ ምዝገባ",
+    subtitle: "ትክክለኛ ስራ በትክክለኛ ጊዜ",
+    personalDetails: "የግል መረጃ",
+    firstName: "ስም",
+    lastName: "የአባት ስም",
+    email: "የኢሜይል አድራሻ",
+    phone: "ስልክ ቁጥር",
+    dob: "የትውልድ ቀን",
+    gender: "ጾታ",
+    select: "ምረጥ",
+    male: "ወንድ",
+    female: "ሴት",
+    other: "ሌላ",
+    locationCourses: "አድራሻ እና ኮርሶች",
+    address: "አድራሻ",
+    city: "ከተማ",
+    selectCourses: "ኮርሶችን ይምረጡ",
+    multipleAllowed: "(ከአንድ በላይ መምረጥ ይቻላል)",
+    loading: "ኮርሶችን በማምጣት ላይ...",
+    noCourses: "ምንም ኮርሶች የሉም።",
+    submit: "ምዝገባውን አረጋግጥ",
+    processing: "በማስኬድ ላይ...",
+    poweredBy: "በ DreamMore የተዘጋጀ",
+    successTitle: "ምዝገባዎ ተሳክቷል!",
+    successMsg: "መረጃዎትን ተቀብለናል፣ በቅርቡ እናገኝዎታለን።",
+    registerAnother: "ሌላ ተማሪ ያስመዝግቡ",
+    placeholderFirst: "አበበ",
+    placeholderLast: "ከበደ",
+    placeholderAddress: "ቦሌ፣ አዲስ አበባ",
+    placeholderCity: "አዲስ አበባ"
+  }
+};
+
 export default function Home() {
+  const [lang, setLang] = useState<'en' | 'am'>('en');
+  const t = TRANSLATIONS[lang];
+
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState('');
@@ -76,7 +146,7 @@ export default function Home() {
     setSubmitError('');
 
     if (formData.selectedCourses.length === 0) {
-      setSubmitError('Please select at least one course.');
+      setSubmitError(lang === 'en' ? 'Please select at least one course.' : 'እባክዎ ቢያንስ አንድ ኮርስ ይምረጡ።');
       return;
     }
 
@@ -98,10 +168,14 @@ export default function Home() {
       setSuccess(true);
       setFormData(INITIAL_FORM);
     } catch (err: any) {
-      setSubmitError('Registration failed: ' + err.message);
+      setSubmitError((lang === 'en' ? 'Registration failed: ' : 'ምዝገባው አልተሳካም: ') + err.message);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const toggleLanguage = () => {
+    setLang(prev => prev === 'en' ? 'am' : 'en');
   };
 
   if (success) {
@@ -109,13 +183,13 @@ export default function Home() {
       <div className="min-h-screen flex items-center justify-center p-6 relative z-10">
         <div className="glass-card p-10 max-w-md w-full text-center animate-in zoom-in duration-500">
           <CheckCircle2 className="w-24 h-24 text-[var(--color-brand-orange)] mx-auto mb-6" />
-          <h2 className="text-3xl font-bold text-[var(--color-brand-blue)] mb-3">Registration Successful!</h2>
-          <p className="text-slate-600 mb-8 font-medium">We received your details and will be in touch shortly.</p>
+          <h2 className="text-3xl font-bold text-[var(--color-brand-blue)] mb-3">{t.successTitle}</h2>
+          <p className="text-slate-600 mb-8 font-medium">{t.successMsg}</p>
           <button
             onClick={() => setSuccess(false)}
             className="md-btn-primary w-full py-4 text-lg"
           >
-            Register Another Student
+            {t.registerAnother}
           </button>
         </div>
       </div>
@@ -123,10 +197,21 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen py-14 px-4 sm:px-6 lg:px-8 relative z-10">
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 relative z-10">
       
+      {/* Language Toggle */}
+      <div className="max-w-4xl mx-auto flex justify-end mb-6">
+        <button 
+          onClick={toggleLanguage}
+          className="md-btn-secondary flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm hover:bg-white"
+        >
+          <Globe className="w-4 h-4" />
+          {lang === 'en' ? 'አማርኛ' : 'English'}
+        </button>
+      </div>
+
       {/* Header with Logo */}
-      <div className="text-center mb-12 flex flex-col items-center">
+      <div className="text-center mb-10 flex flex-col items-center">
         <div className="mb-6 bg-white p-2 rounded-2xl shadow-lg border border-slate-100 inline-block overflow-hidden">
           <Image 
             src="/logo.jpg" 
@@ -138,10 +223,10 @@ export default function Home() {
           />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-[var(--color-brand-blue)] tracking-tight mb-3">
-          Student Registration
+          {t.title}
         </h1>
         <p className="text-[var(--color-brand-orange)] font-bold text-xl tracking-wide uppercase">
-          Right work at right time
+          {t.subtitle}
         </p>
       </div>
 
@@ -156,59 +241,59 @@ export default function Home() {
           <div className="space-y-6">
             <h3 className="text-[var(--color-brand-blue)] font-bold text-xl flex items-center gap-2 mb-6 uppercase tracking-wider border-b border-slate-200 pb-3">
               <User className="w-6 h-6 text-[var(--color-brand-orange)]" /> 
-              Personal Details
+              {t.personalDetails}
             </h3>
 
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">First Name</label>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.firstName}</label>
                 <input required name="firstName" value={formData.firstName} onChange={handleChange}
-                  placeholder="John"
+                  placeholder={t.placeholderFirst}
                   className="w-full md-input px-4 py-3" />
               </div>
               <div>
-                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Last Name</label>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.lastName}</label>
                 <input required name="lastName" value={formData.lastName} onChange={handleChange}
-                  placeholder="Doe"
+                  placeholder={t.placeholderLast}
                   className="w-full md-input px-4 py-3" />
               </div>
             </div>
 
             <div>
-              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Email Address</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.email}</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input required type="email" name="email" value={formData.email} onChange={handleChange}
-                  placeholder="john@example.com"
+                  placeholder="abebe@example.com"
                   className="w-full md-input pl-12 pr-4 py-3" />
               </div>
             </div>
 
             <div>
-              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Phone Number</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.phone}</label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input required type="tel" name="phone" value={formData.phone} onChange={handleChange}
-                  placeholder="+1 555 000-0000"
+                  placeholder="+251 911 000000"
                   className="w-full md-input pl-12 pr-4 py-3" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Date of Birth</label>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.dob}</label>
                 <input required type="date" name="dob" value={formData.dob} onChange={handleChange}
                   className="w-full md-input px-4 py-3" />
               </div>
               <div>
-                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Gender</label>
+                <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.gender}</label>
                 <div className="relative">
                   <select required name="gender" value={formData.gender} onChange={handleChange}
                     className="w-full md-input px-4 py-3 appearance-none cursor-pointer">
-                    <option value="" disabled>Select</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="" disabled>{t.select}</option>
+                    <option value="Male">{t.male}</option>
+                    <option value="Female">{t.female}</option>
+                    <option value="Other">{t.other}</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
                     <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -222,22 +307,22 @@ export default function Home() {
           <div className="space-y-6">
             <h3 className="text-[var(--color-brand-blue)] font-bold text-xl flex items-center gap-2 mb-6 uppercase tracking-wider border-b border-slate-200 pb-3">
               <MapPin className="w-6 h-6 text-[var(--color-brand-orange)]" /> 
-              Location & Courses
+              {t.locationCourses}
             </h3>
 
             <div>
-              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">Address</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.address}</label>
               <textarea required name="address" value={formData.address} onChange={handleChange}
-                rows={2} placeholder="123 Main Street, Apt 4B"
+                rows={2} placeholder={t.placeholderAddress}
                 className="w-full md-input px-4 py-3 resize-none" />
             </div>
 
             <div>
-              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">City</label>
+              <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-1">{t.city}</label>
               <div className="relative">
                 <Building className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input required name="city" value={formData.city} onChange={handleChange}
-                  placeholder="New York"
+                  placeholder={t.placeholderCity}
                   className="w-full md-input pl-12 pr-4 py-3" />
               </div>
             </div>
@@ -245,14 +330,14 @@ export default function Home() {
             {/* ─── Courses ─── */}
             <div>
               <label className="text-[var(--color-brand-blue)] text-sm font-bold block mb-3">
-                Select Courses <span className="text-slate-500 font-normal ml-1">(multiple allowed)</span>
+                {t.selectCourses} <span className="text-slate-500 font-normal ml-1">{t.multipleAllowed}</span>
               </label>
 
               <div className="glass-panel p-2 max-h-[200px] overflow-y-auto">
                 {loading && (
                   <div className="flex flex-col items-center gap-3 py-6 text-slate-600">
                     <Loader2 className="w-8 h-8 animate-spin text-[var(--color-brand-orange)]" />
-                    <span className="font-bold">Loading courses...</span>
+                    <span className="font-bold">{t.loading}</span>
                   </div>
                 )}
 
@@ -264,7 +349,7 @@ export default function Home() {
 
                 {!loading && !fetchError && courses.length === 0 && (
                   <div className="text-slate-600 text-center py-6 font-bold">
-                    No courses available yet.
+                    {t.noCourses}
                   </div>
                 )}
 
@@ -278,6 +363,13 @@ export default function Home() {
                             checked ? 'bg-[var(--color-brand-orange)]/10 border border-[var(--color-brand-orange)]/50 shadow-sm' : 'bg-white/40 hover:bg-white/60 border border-transparent'
                           }`}>
                           
+                          <input 
+                            type="checkbox" 
+                            className="hidden" 
+                            checked={checked} 
+                            onChange={() => toggleCourse(course.course_name)} 
+                          />
+
                           <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${checked ? 'bg-[var(--color-brand-orange)] border-[var(--color-brand-orange)]' : 'bg-white border-slate-300'}`}>
                             {checked && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
                           </div>
@@ -305,13 +397,13 @@ export default function Home() {
             <button type="submit" disabled={submitting}
               className="md-btn-primary w-full py-4 text-lg flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed">
               {submitting ? (
-                <><Loader2 className="w-6 h-6 animate-spin" /> PROCESSING...</>
+                <><Loader2 className="w-6 h-6 animate-spin" /> {t.processing}</>
               ) : (
-                'SUBMIT REGISTRATION'
+                t.submit
               )}
             </button>
             <p className="text-center text-xs font-bold text-slate-500 mt-4 uppercase tracking-wider">
-              Powered by DreamMore
+              {t.poweredBy}
             </p>
           </div>
         </form>
