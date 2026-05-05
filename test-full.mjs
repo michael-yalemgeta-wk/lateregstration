@@ -59,7 +59,7 @@ async function runTests() {
       email: 'test@example.com',
       phone: '0000000000',
       date_of_birth: '2000-01-01',
-      gender: 'Other',
+      gender: 'Male',
       address: 'Test Address',
       city: 'Test City',
       selected_courses: ['Introduction to Next.js'],
